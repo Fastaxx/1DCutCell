@@ -1,6 +1,6 @@
 using LinearAlgebra, SparseArrays, Plots
 Plots.default(show=true)
-N = 1280       # N points intéreurs
+N = 160       # N points intéreurs
 a = 0.0      # Borne inférieure
 b = 1.0      # Borne supérieure
 L = b - a   # Longueur du domaine
@@ -89,10 +89,10 @@ error= u_ω - exact_
 plot(x[2:end-1], error)
 readline()
 
-# Print
-println(maximum(abs.(error)))
+# Print Max Norm
+println("Max Norm", maximum(abs.(error)))
 
-
-# Max Norm : 
+# Norm : 
 # N : 1280                   640                     320                     160
-# E : 0.0003091374432173191  0.0006815419916040562   0.0014251382010778545   0.0029072828242329026
+# E-max : 0.0003091374432173191  0.0006815419916040562   0.0014251382010778545   0.0029072828242329026
+
