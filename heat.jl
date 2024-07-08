@@ -13,11 +13,13 @@ h = 1 / (2N + 1) # Pas de maillage
 Rₐ = 0.0    # Valeur CL à gauche
 Rᵦ = 0.0    # Valeur CL à droite
 T = 1.0     # Temps final
-Nt = 10000   # Nombre d'incréments
+Nt = 100000   # Nombre d'incréments
 dt = T/Nt   # Pas de temps
 
 function solve_heat_cut_cell_implicit(N,a,b,L,ϵ,h,Rₐ,Rᵦ,dt,T,u,f,g,S)
-    x = [a + 2i*h for i in 0:N+1]
+    x_f = [a + 2i*h for i in 0:N]
+    x_f2 = [x_f[1]-2ϵ*L; x_f; x_f[end]+2ϵ*L]
+    x = [(x_f2[i]+x_f2[i+1])/2 for i in 1:N+2]
 
     A = spzeros(N+2,N+2)
     b = zeros(N+2)
@@ -76,7 +78,9 @@ function solve_heat_cut_cell_implicit(N,a,b,L,ϵ,h,Rₐ,Rᵦ,dt,T,u,f,g,S)
 end
 
 function solve_heat_cut_cell_crank(N,a,b,L,ϵ,h,Rₐ,Rᵦ,dt,T,u,f,g,S)
-    x = [a + 2i*h for i in 0:N+1]
+    x_f = [a + 2i*h for i in 0:N]
+    x_f2 = [x_f[1]-2ϵ*L; x_f; x_f[end]+2ϵ*L]
+    x = [(x_f2[i]+x_f2[i+1])/2 for i in 1:N+2]
 
     A = spzeros(N+2,N+2)
     b = zeros(N+2)
@@ -134,8 +138,9 @@ function solve_heat_cut_cell_crank(N,a,b,L,ϵ,h,Rₐ,Rᵦ,dt,T,u,f,g,S)
     return u_ω, u_γ, x
 end
 
-
-x = [a + 2i*h for i in 0:N+1]
+x_f = [a + 2i*h for i in 0:N]
+x_f2 = [x_f[1]-2ϵ*L; x_f; x_f[end]+2ϵ*L]
+x = [(x_f2[i]+x_f2[i+1])/2 for i in 1:N+2]
 
 # Exact Solution
 exact_heat(x,t) = exp(-t)*cos(x)
@@ -169,7 +174,7 @@ readline()
 
 
 function compute_norm(error, ϵ, h, L)
-    l2 = sqrt(sum((error[2:end-1]).^2*(2*h*L)) + error[1]^2*(2*ϵ*L) + error[end]^2*(2*ϵ*L))/(2*2*ϵ*L + 2*h*L*(N-2))
+    l2 = sqrt(sum((error[2:end-1]).^2*(2*h*L)) + error[1]^2*(2*ϵ*L) + error[end]^2*(2*ϵ*L)/(2*2*ϵ*L + 2*h*L*(N-2)))
     return l2
 end
 
@@ -190,6 +195,4 @@ println("L2 Norm - Crank : ",l2_c)
 println("Max Norm")
 println("Max Norm - Implicit : ", maximum(abs.(error)))
 println("Max Norm - Crank : ", maximum(abs.(error_c)))
-
-
 
